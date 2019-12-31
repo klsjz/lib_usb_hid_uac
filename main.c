@@ -46,13 +46,15 @@ int main(int argc, char *argv[])
 
 	kl_start_play(p_as_dev);
 
+	kl_uac_open(p_as_dev);
+	printf("after uac open1111\r\n");
 	//while (flag==1)
 	{
 		kl_audio_play(p_as_dev,__1_wav,__1_wav_len);
 	}
 
 	//kl_stop_play(p_as_dev);
-#if 1
+#if 0
 	kl_start_record(p_as_dev);
 	while(flag==1 && !kl_audio_read(p_as_dev,pAudio_buffer,&audio_info))
 	{

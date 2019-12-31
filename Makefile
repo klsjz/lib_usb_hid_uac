@@ -30,6 +30,7 @@ WORK_PATH =$(shell pwd)
 DFU_SRC_FILES                 := ${WORK_PATH}/hidapi.c
 DFU_SRC_FILES                 += ${WORK_PATH}/taihang_hid.c
 DFU_SRC_FILES                 += ${WORK_PATH}/th_protocol.c
+DFU_SRC_FILES                 += ${WORK_PATH}/taihang_uac.c
 DFU_SRC_FILES                 += ${WORK_PATH}/main.c
 
 DFU_OBJ 					  := $(patsubst %.c, %.o, ${DFU_SRC_FILES})
