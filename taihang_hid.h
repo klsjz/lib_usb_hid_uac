@@ -32,7 +32,8 @@ typedef struct
   int8_t rollback;
   uint8_t reservd1[2];
   int16_t Doa;
-  uint8_t reserved2[92];
+  uint32_t confidence_factor;
+  uint8_t reserved2[88];
 } __attribute__((packed)) kl_audio_info_t;
 
 #else

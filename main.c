@@ -68,6 +68,8 @@ int main(int argc, char *argv[])
         printf("wakeup words:%s\n", audio_info.WakeUpInfo);
         printf("MajorStatus:%d\n", audio_info.MajorStatus);
         printf("Doa:%d\n", audio_info.Doa);
+        printf("Vad:%d\n", audio_info.Vad);
+        printf("confidence_factor:%d\n",audio_info.confidence_factor);
         printf("WakeupStatus:%d\n",audio_info.WakeupStatus);
 	}
 	kl_stop_record(p_as_dev);
