@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	char buffer[64]={0};
 	int size;
 	int period_size=1024; //fixed size
-
+	int ret;
 	kl_audio_info_t audio_info;
 	char *pAudio_buffer;
 
@@ -52,14 +52,31 @@ int main(int argc, char *argv[])
 	{
 		kl_audio_play(p_as_dev,__1_wav,__1_wav_len);
 	}
-
-	//kl_stop_play(p_as_dev);
-#if 0
+	ret  = libusb_set_option(NULL,LIBUSB_OPTION_LOG_LEVEL);
+	#if 0
+	while(1)	
+	{		
+		ret = libusb_handle_events(NULL);		
+		if(ret != LIBUSB_SUCCESS)		
+		{			
+			printf("can:: handle event erro ,exit! [%d%s]\n",__LINE__,__FUNCTION__);			
+			break;		
+		}	
+	}
+	#endif
+	kl_stop_play(p_as_dev);
+#if 1
 	kl_start_record(p_as_dev);
 	while(flag==1 && !kl_audio_read(p_as_dev,pAudio_buffer,&audio_info))
 	{
 		//kl_audio_play(p_as_dev,xxx_00001_wav,xxx_00001_wav_len);
 		//kl_audio_play(p_as_dev,__1_wav,__1_wav_len);
+		ret = libusb_handle_events(NULL);		
+		if(ret != LIBUSB_SUCCESS)		
+		{			
+			printf("can:: handle event erro ,exit! [%d%s]\n",__LINE__,__FUNCTION__);			
+			break;		
+		}	
 
 	    if (fwrite(pAudio_buffer, 1, period_size, file) != period_size) 
 	    {
