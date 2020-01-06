@@ -31,6 +31,8 @@ DFU_SRC_FILES                 := ${WORK_PATH}/hidapi.c
 DFU_SRC_FILES                 += ${WORK_PATH}/taihang_hid.c
 DFU_SRC_FILES                 += ${WORK_PATH}/th_protocol.c
 DFU_SRC_FILES                 += ${WORK_PATH}/taihang_uac.c
+DFU_SRC_FILES                 += ${WORK_PATH}/taihang_download.c
+
 DFU_SRC_FILES                 += ${WORK_PATH}/main.c
 
 DFU_OBJ 					  := $(patsubst %.c, %.o, ${DFU_SRC_FILES})
@@ -55,7 +57,7 @@ INCLUDE_FLAGS  				  += -I$(WORK_PATH)/
 LOCAL_CFLAGS 				  := -Wall -g -O0 -DHAVE_CONFIG_H  $(INCLUDE_FLAGS)
 
 #LOCAL_CFLAGS 				  := -Wall -g -O0 -DHAVE_CONFIG_H  $(INCLUDE_FLAGS) 
-LOCAL_LDFLAGS 				  += -pie -fPIE -pthread  -fPIC -ludev
+LOCAL_LDFLAGS 				  += -pie -fPIE -pthread  -fPIC -ludev  
 
 
 .PHONY: clean all help
@@ -67,6 +69,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE) : $(DFU_OBJ) $(SLIB)
 #$(EXECUTABLE) : $(DFU_OBJ)
+	echo $(DFU_OBJ) $(SLIB) 
 	$(CXX) $^  $(LOCAL_LDFLAGS) $(LOCAL_CFLAGS)  -fPIC -pthread -o $@
 	
 dtest: ${WORK_PATH}/main.o $(DLIB)

@@ -1,6 +1,3 @@
-
-
-
 #include "libusb.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,7 +64,7 @@ as_hid_dev_p kl_device_open(void)
 	
 	as_hid_dev_p p_as_dev;
 	int vid=0x5448;
-	int pid=0x000a;
+	int pid=0x1525;
 
 	p_as_dev=init_as_standard_interface(vid,pid);
 

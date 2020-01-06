@@ -5,17 +5,18 @@
 #include "taihang_hid.h"
 
 
-static FILE* fout=NULL;
+extern FILE* fout_uac;
 uint8_t buf[NUM_TRANSFERS][PACKET_SIZE*NUM_PACKETS];
 static int bFisrt = 1;
+extern int flag;
 //数据传输完成后，transfer传输任务会调用此回调函数。我们在这里拿走数据，并且继续把添加新的transfer任务，循环读取static FILE* fout=NULL;static int bFisrt = 1;
 static void cb_xfr(struct libusb_transfer *xfr)
 {	
 	if(bFisrt)	
 	{		
 		bFisrt = 0;		
-		fout = fopen("./output_data.pcm","w+");		
-		if(fout == NULL)		
+		fout_uac = fopen("./uac_data.pcm","w+");		
+		if(fout_uac == NULL)		
 		{			
 			printf("canok:: erro to openfile[%d%s] \n",__LINE__,__FUNCTION__);		
 		}
@@ -23,7 +24,7 @@ static void cb_xfr(struct libusb_transfer *xfr)
 	int  i =0;	
 	static j = 0;
 	j++;
-	if(fout)	
+	if(fout_uac)	
 	{
 		//取出数据给到文件		
 		for(i=0;i<xfr->num_iso_packets;i++)		
@@ -34,21 +35,30 @@ static void cb_xfr(struct libusb_transfer *xfr)
 				printf("canok:: erro transfer status %d %s [%d%s]\n",pack->status,libusb_error_name(pack->status),__LINE__,__FUNCTION__);
 				break;			
 			} 			
-		const uint8_t *data = libusb_get_iso_packet_buffer_simple(xfr, i);			
-		printf("get out data %d [%d%s]\n",pack->actual_length,__LINE__,__FUNCTION__);			
-		fwrite(data,1,pack->actual_length,fout);		
+			const uint8_t *data = libusb_get_iso_packet_buffer_simple(xfr, i);			
+	//	printf("get out data %d [%d%s]\n",pack->actual_length,__LINE__,__FUNCTION__);			
+			fwrite(data,1,pack->actual_length,fout_uac);		
 		} 	
 	}	 	
 	//把transfer任务重新在提交上去	
-	if (libusb_submit_transfer(xfr) < 0)
-	{		
-		printf("error re-submitting !!!!!!!exit ----------[%d%s]\n",__LINE__,__FUNCTION__);		
-		exit(1);	
-	}	
-	else
-	{		
-		printf("re-submint ok j%d!\n",j);	
+	if(flag)
+	{
+		if (libusb_submit_transfer(xfr) < 0)
+			{		
+				printf("error re-submitting !!!!!!!exit ----------[%d%s]\n",__LINE__,__FUNCTION__);		
+				exit(1);	
+			}	
+		else
+		{		
+		//	printf("re-submint ok j%d!\n",j);	
+		}
 	}
+	else
+	{
+		libusb_free_transfer(xfr);
+	}
+	
+
 }
 
 int kl_uac_open(as_hid_dev_p p_as_dev)

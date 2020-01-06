@@ -5,6 +5,9 @@
 #include "stdio.h"
 
 FILE *file;
+FILE* fout_uac;
+FILE* image_file;
+char *image_buff;
 int flag=1;
 as_hid_dev_p p_as_dev;
 
@@ -14,6 +17,7 @@ void exit_all_process(void)
 	//sleep(1);
 	//if (p_as_dev)
 	//	kl_device_close(p_as_dev);
+	free(image_buff);
 	printf("\noops, exit\n");
 	//exit(0);
 }
@@ -23,31 +27,39 @@ void exit_all_process(void)
 int main(int argc, char *argv[])
 {
 	char buffer[64]={0};
-	int size;
+	int size,image_len;
 	int period_size=1024; //fixed size
 	int ret;
+	int i;
 	kl_audio_info_t audio_info;
 	char *pAudio_buffer;
-
 	//init audio buffer
 	pAudio_buffer=(char *)malloc(period_size);
 	memset(&audio_info,sizeof(kl_audio_info_t),0);
     
     signal(SIGINT, exit_all_process); 
     file = fopen("./hidpcm.pcm", "wb");
-	
+	image_file = fopen("./taihang.fw","r");
+	fseek(image_file, 0L, SEEK_END);
+	image_len =ftell(image_file);
+	fseek(image_file, 0, SEEK_SET);
+	printf("the image len is %d\r\n",image_len);
+	image_buff = (char *)malloc(image_len);
+	fread(image_buff,1,image_len,image_file);
+	fclose(image_file);
 	p_as_dev=kl_device_open();
 
 	if (!p_as_dev)
 	{
 		printf("open hid device failed\n");
 		goto err;
-	}
+	}image_buff;
+	ret = taihang_download(0,image_len,image_buff);
 
 	kl_start_play(p_as_dev);
 
 	kl_uac_open(p_as_dev);
-	printf("after uac open1111\r\n");
+
 	//while (flag==1)
 	{
 		kl_audio_play(p_as_dev,__1_wav,__1_wav_len);
@@ -94,7 +106,8 @@ int main(int argc, char *argv[])
 	kl_stop_record(p_as_dev);
 	kl_stop_play(p_as_dev);
 #endif
-
+    fclose(file);
+	fclose(fout_uac);
 	kl_device_close(p_as_dev);
 
 out:
