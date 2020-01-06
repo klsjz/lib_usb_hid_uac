@@ -1,0 +1,41 @@
+echo /home/sunjinzhou/hid_usb/main.o /home/sunjinzhou/hid_usb/taihang_hid.o /home/sunjinzhou/hid_usb/taihang_uac.o /home/sunjinzhou/hid_usb/taihang_download.o /home/sunjinzhou/hid_usb/th_protocol.o /home/sunjinzhou/hid_usb/hidapi.o libusb-1.0.a
+/home/sunjinzhou/hid_usb/main.o /home/sunjinzhou/hid_usb/taihang_hid.o /home/sunjinzhou/hid_usb/taihang_uac.o /home/sunjinzhou/hid_usb/taihang_download.o /home/sunjinzhou/hid_usb/th_protocol.o /home/sunjinzhou/hid_usb/hidapi.o libusb-1.0.a
+echo  -Wall -O3  -pie -fPIE -pthread -fPIC -ludev -L/home/sunjinzhou/hid_usb -lusb-1.0
+-Wall -O3 -pie -fPIE -pthread -fPIC -ludev -L/home/sunjinzhou/hid_usb -lusb-1.0
+g++ /home/sunjinzhou/hid_usb/main.o /home/sunjinzhou/hid_usb/taihang_hid.o /home/sunjinzhou/hid_usb/taihang_uac.o /home/sunjinzhou/hid_usb/taihang_download.o /home/sunjinzhou/hid_usb/th_protocol.o /home/sunjinzhou/hid_usb/hidapi.o -pie -fPIE -pthread -fPIC -ludev -L/home/sunjinzhou/hid_usb -lusb-1.0  -Wall -O3  -o taihang_usb_tool
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `linux_udev_start_event_monitor':
+linux_udev.c:(.text+0x6a): undefined reference to `udev_new'
+linux_udev.c:(.text+0xba): undefined reference to `udev_monitor_new_from_netlink'
+linux_udev.c:(.text+0x111): undefined reference to `udev_monitor_filter_add_match_subsystem_devtype'
+linux_udev.c:(.text+0x150): undefined reference to `udev_monitor_enable_receiving'
+linux_udev.c:(.text+0x18a): undefined reference to `udev_monitor_get_fd'
+linux_udev.c:(.text+0x3ac): undefined reference to `udev_monitor_unref'
+linux_udev.c:(.text+0x3d0): undefined reference to `udev_unref'
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `linux_udev_stop_event_monitor':
+linux_udev.c:(.text+0x4e4): undefined reference to `udev_monitor_unref'
+linux_udev.c:(.text+0x508): undefined reference to `udev_unref'
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `linux_udev_event_thread_main':
+linux_udev.c:(.text+0x65c): undefined reference to `udev_monitor_receive_device'
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `udev_device_info':
+linux_udev.c:(.text+0x720): undefined reference to `udev_device_get_devnode'
+linux_udev.c:(.text+0x73e): undefined reference to `udev_device_get_sysname'
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `udev_hotplug_event':
+linux_udev.c:(.text+0x7c6): undefined reference to `udev_device_get_action'
+linux_udev.c:(.text+0x8e6): undefined reference to `udev_device_unref'
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `linux_udev_scan_devices':
+linux_udev.c:(.text+0x952): undefined reference to `udev_enumerate_new'
+linux_udev.c:(.text+0x99e): undefined reference to `udev_enumerate_add_match_subsystem'
+linux_udev.c:(.text+0x9b8): undefined reference to `udev_enumerate_add_match_property'
+linux_udev.c:(.text+0x9c4): undefined reference to `udev_enumerate_scan_devices'
+linux_udev.c:(.text+0x9d0): undefined reference to `udev_enumerate_get_list_entry'
+linux_udev.c:(.text+0x9f5): undefined reference to `udev_list_entry_get_name'
+linux_udev.c:(.text+0xa17): undefined reference to `udev_device_new_from_syspath'
+linux_udev.c:(.text+0xa57): undefined reference to `udev_device_unref'
+linux_udev.c:(.text+0xa83): undefined reference to `udev_device_unref'
+linux_udev.c:(.text+0xa8f): undefined reference to `udev_list_entry_get_next'
+linux_udev.c:(.text+0xaaa): undefined reference to `udev_enumerate_unref'
+/home/sunjinzhou/hid_usb/libusb-1.0.a(libusb_1_0_la-linux_udev.o): In function `linux_udev_hotplug_poll':
+linux_udev.c:(.text+0xaeb): undefined reference to `udev_monitor_receive_device'
+collect2: error: ld returned 1 exit status
+/home/sunjinzhou/hid_usb/aimake/linux/build_all.mk:42: recipe for target 'taihang_usb_tool' failed
+make: *** [taihang_usb_tool] Error 1

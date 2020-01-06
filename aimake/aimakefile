@@ -1,0 +1,44 @@
+#DFU_SRC_FILES := $(patsubst %.c, %,$(wildcard ../I94100/dfu-util/src/*.c))
+
+WORK_PATH :=/home/sunjinzhou/hid_usb
+
+
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES			+= ${WORK_PATH}/taihang_hid.c
+LOCAL_SRC_FILES			+= ${WORK_PATH}/th_protocol.c
+LOCAL_SRC_FILES			+= ${WORK_PATH}/hidapi.c
+DFU_SRC_FILES                 += ${WORK_PATH}/taihang_uac.c
+
+
+
+#LOCAL_SRC_FILES			+= ${WORK_PATH}/main.c
+#LOCAL_SRC_FILES			+= ${WORK_PATH}/libusb-1.0.a
+
+LIB = ${WORK_PATH}/libusbandroid.a
+
+
+INCLUDE_FLAGS  += -I$(WORK_PATH)/
+
+
+include $(PREBUILT_STATIC_LIBRARY)
+#LOCAL_STATIC_LIBRARIES += libusb-1.0
+#LOCAL_SHARED_LIBRARIES += libusb1.0
+
+
+LOCAL_MODULE := taihang_hid
+LOCAL_CFLAGS := -Wall -g -O0 -DHAVE_CONFIG_H  $(INCLUDE_FLAGS) -pie -FPIE  
+#LOCAL_LDFLAGS := $(LIB)
+
+#LOCAL_LDFLAGS := -Wl,-rpath=/data/ -L$(WORK_PATH) -ltaihang_hid -pthread -fPIE -pie
+
+
+#LOCAL_LDFLAGS := -L$(WORK_PATH) -ltaihang_hid -pthread -fPIE -pie
+
+
+#include $(BUILD_ALL)
+#include $(BUILD_EXECUTABLE)
+#include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)
+
