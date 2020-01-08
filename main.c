@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
 	pAudio_buffer=(char *)malloc(period_size);
 	memset(&audio_info,sizeof(kl_audio_info_t),0);
     
-    signal(SIGINT, exit_all_process); 
-    file = fopen("./hidpcm.pcm", "wb");
+	signal(SIGINT, exit_all_process); 
+	file = fopen("./hidpcm.pcm", "wb");
 	image_file = fopen("./taihang.fw","r");
 	fseek(image_file, 0L, SEEK_END);
 	image_len =ftell(image_file);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 	kl_stop_record(p_as_dev);
 	kl_stop_play(p_as_dev);
 #endif
-    fclose(file);
+	fclose(file);
 	fclose(fout_uac);
 	kl_device_close(p_as_dev);
 

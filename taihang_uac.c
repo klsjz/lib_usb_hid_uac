@@ -44,10 +44,10 @@ static void cb_xfr(struct libusb_transfer *xfr)
 	if(flag)
 	{
 		if (libusb_submit_transfer(xfr) < 0)
-			{		
+		{		
 				printf("error re-submitting !!!!!!!exit ----------[%d%s]\n",__LINE__,__FUNCTION__);		
 				exit(1);	
-			}	
+		}	
 		else
 		{		
 		//	printf("re-submint ok j%d!\n",j);	
