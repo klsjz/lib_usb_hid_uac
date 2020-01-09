@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
 	int period_size=1024; //fixed size
 	int ret;
 	int i;
+	uint8_t version = 0;
 	kl_audio_info_t audio_info;
 	char *pAudio_buffer;
 	//init audio buffer
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
     
 	signal(SIGINT, exit_all_process); 
 	file = fopen("./hidpcm.pcm", "wb");
-	image_file = fopen("./taihang.fw","r");
+	image_file = fopen("./taihang1.fw","r");
 	fseek(image_file, 0L, SEEK_END);
 	image_len =ftell(image_file);
 	fseek(image_file, 0, SEEK_SET);
@@ -49,11 +50,29 @@ int main(int argc, char *argv[])
 	fclose(image_file);
 	p_as_dev=kl_device_open();
 
+#if 1
+	ret = dev_info_get(&version);
+	if(ret != LIBUSB_SUCCESS)		
+	{			
+		printf("can not get dev info\r\n");				
+	}
+	else
+	{
+		printf("the version is :%d\r\n",version);
+	}
+		
+	ret = reset_device();
+	if(ret != LIBUSB_SUCCESS)		
+	{			
+		printf("can not reset device\r\n");				
+	}
+	return 0;	
+#endif
 	if (!p_as_dev)
 	{
 		printf("open hid device failed\n");
 		goto err;
-	}image_buff;
+	};
 	ret = taihang_download(0,image_len,image_buff);
 
 	kl_start_play(p_as_dev);

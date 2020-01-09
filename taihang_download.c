@@ -1,5 +1,5 @@
-#include "taihang_download.h"
 #include "libusb.h"
+#include "taihang_download.h"
 #include "taihang_vdcmd.h"
 #include "th_protocol.h"
 #include "taihang_hid.h"
@@ -319,6 +319,8 @@ int vdcmd_read(int rd_len,uint8_t* pdata)
 
     //read data from usb
     ret = usb_get_data(total_len, rd_data);
+
+
     if (ret == FAIL)
     {
         printf("vcmd_read fail\n");
@@ -408,6 +410,54 @@ int read_and_compara(uint32_t addr, int len, uint8_t image_file[])
     }
         free(read_data_list);
         return SUCCESS;
+
+}
+
+int reset_device()
+{
+    int ret;
+    unsigned short crc;
+
+    vdcmd_header.cmd_type = 2;
+    vdcmd_header.sub_cmd = 0x02;
+    //vdcmd_header.sof = VDCMD_SOF;
+
+   // memcpy(cmd_buf,&vdcmd_header,sizeof(vdcmd_t));
+   // crc = crc16_ccitt_sw(0, cmd_buf, VDCMD_HEADER_LEN);
+   // cmd_buf[VDCMD_HEADER_LEN] = crc & 0xff;
+   // md_buf[VDCMD_HEADER_LEN + 1] = crc >> 8;
+    ret = vdcmd_write(0);
+    if(ret!=SUCCESS)
+    {
+        printf("spi_write error\r\n");
+        return FAIL;
+    }
+    return SUCCESS;
+
+}
+
+int dev_info_get(uint8_t * version)
+{
+    int ret;
+    unsigned short crc;
+
+    vdcmd_header.cmd_type = 2;
+    vdcmd_header.sub_cmd = 0x81;
+    vdcmd_header.len = 1;
+    //vdcmd_header.sof = VDCMD_SOF;
+
+   // memcpy(cmd_buf,&vdcmd_header,sizeof(vdcmd_t));
+   // crc = crc16_ccitt_sw(0, cmd_buf, VDCMD_HEADER_LEN);
+   // cmd_buf[VDCMD_HEADER_LEN] = crc & 0xff;
+   // md_buf[VDCMD_HEADER_LEN + 1] = crc >> 8;
+    ret = vdcmd_read(1,version);
+   // printf("version:%02x\r\n",*version);
+    if(ret!=SUCCESS)
+    {
+        printf("spi_write error\r\n");
+        return FAIL;
+    }
+    return SUCCESS;
 
 }
 

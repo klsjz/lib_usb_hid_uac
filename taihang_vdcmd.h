@@ -32,11 +32,11 @@
 #define VDCMD_LEN_MAX               (VDCMD_CRC_LEN+VDCMD_DATA_LEN_MAX+VDCMD_HEADER_LEN)
 
 
-#define SUCCESS   1
-#define FAIL      0
+#define SUCCESS   0
+#define FAIL      1
 
 #define DOWNLOAD_START  0
-#define DOWNLOAD_END  1
+#define DOWNLOAD_END    1
 
 #define USB_VDREQUEST_I2C_R	0x44
 #define USB_VDREQUEST_I2C_W	0x45
