@@ -8,7 +8,7 @@
 extern FILE* fout_uac;
 uint8_t buf[NUM_TRANSFERS][PACKET_SIZE*NUM_PACKETS];
 static int bFisrt = 1;
-extern int flag;
+int uac_flag;
 //数据传输完成后，transfer传输任务会调用此回调函数。我们在这里拿走数据，并且继续把添加新的transfer任务，循环读取static FILE* fout=NULL;static int bFisrt = 1;
 static void cb_xfr(struct libusb_transfer *xfr)
 {	
@@ -41,7 +41,7 @@ static void cb_xfr(struct libusb_transfer *xfr)
 		} 	
 	}	 	
 	//把transfer任务重新在提交上去	
-	if(flag)
+	if(uac_flag)
 	{
 		if (libusb_submit_transfer(xfr) < 0)
 		{		
@@ -61,9 +61,10 @@ static void cb_xfr(struct libusb_transfer *xfr)
 
 }
 
-int kl_uac_open(as_hid_dev_p p_as_dev)
+int kl_uac_close(as_hid_dev_p p_as_dev)
 {
 	int ret,i;
+	uac_flag = 0;
 	char rate[3] = {0x80,0x3e,0};
 	//先做一个check，确保设备没有占用，在最小demo情况下，可以先不考虑这种复杂情况	
 	ret = libusb_kernel_driver_active(p_as_dev->dev_handle,1);
@@ -86,7 +87,41 @@ int kl_uac_open(as_hid_dev_p p_as_dev)
 		return -1;	
 	} 
 	//-------------------同一个接口可以有多个接口描述符，用bAlternateSetting来识别.	//在Interface Descriptor 中的bAlternateSetting 值	
-	libusb_set_interface_alt_setting(p_as_dev->dev_handle,1,1);
+	ret = libusb_set_interface_alt_setting(p_as_dev->dev_handle,1,0);
+	if(ret < LIBUSB_SUCCESS)	
+	{		
+		printf(" %s %d [%d%s]\n",libusb_error_name(ret),ret,__LINE__,__FUNCTION__);		
+	} 
+	return ret;
+}
+
+int kl_uac_open(as_hid_dev_p p_as_dev)
+{
+	int ret,i;
+	char rate[3] = {0x80,0x3e,0};
+	uac_flag = 1;
+	//先做一个check，确保设备没有占用，在最小demo情况下，可以先不考虑这种复杂情况	
+	ret = libusb_kernel_driver_active(p_as_dev->dev_handle,1);
+	if(ret == 1)
+	{		
+		printf("acticve ,to deteach .\r\n");		
+		ret = libusb_detach_kernel_driver(p_as_dev->dev_handle,1);		
+		if(ret <0)		
+		{			
+			printf("canok:: erro to detach kernel!!![%d%s]\n",__LINE__,__FUNCTION__);			
+			return -1;		
+		}	
+	}
+
+	//------------------请求使用一个 interface 第二个参数是 interface 编号
+	ret = libusb_claim_interface(p_as_dev->dev_handle,1);	
+	if(ret < 0)	
+	{		
+		printf("can:: erro claming interface %s %d [%d%s]\n",libusb_error_name(ret),ret,__LINE__,__FUNCTION__);		
+		return -1;	
+	} 
+	//-------------------同一个接口可以有多个接口描述符，用bAlternateSetting来识别.	//在Interface Descriptor 中的bAlternateSetting 值	
+	ret = libusb_set_interface_alt_setting(p_as_dev->dev_handle,1,1);
 
     ret = libusb_control_transfer(p_as_dev->dev_handle, LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_ENDPOINT, 
                             0x01, 0x0100, 0x81, 

@@ -69,6 +69,6 @@ extern int kl_stop_play(as_hid_dev_p p_as_dev);
 extern int kl_start_play(as_hid_dev_p p_as_dev);
 
 extern int kl_audio_play(as_hid_dev_p p_as_dev,char *pAudio_buffer, unsigned int length);
-
+extern int kl_get_fw_version(as_hid_dev_p p_as_dev,unsigned char* version);
 
 #endif

@@ -82,6 +82,56 @@ err:
 	return NULL;
 }
 
+int kl_get_fw_version(as_hid_dev_p p_as_dev,unsigned char* version)
+{
+	int ret,size;
+	unsigned char buf[64]={0};
+	size_t max_len;
+	max_len = p_as_dev->input_ep_max_packet_size;
+
+    //fill in the hid buffer
+	th_hid_req(COMMAND,GET_FW_VERSION);
+    //p_as_dev->transfer = libusb_alloc_transfer(0);
+    size=64;
+	ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+			p_as_dev->output_endpoint,
+			hid_buffer,
+			max_len,
+			&size,
+			0//no time out
+		); 
+
+	if (ret==0)
+	{
+		ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+			p_as_dev->input_endpoint,
+			buf,
+			max_len,
+			&size,
+			0//no time out
+		); 
+		if (0==ret)
+		{
+			//printf("rsp length:%d\n", size);
+			//printf("rsp type:0x%x\n", buf[0]);
+			//printf("rsp status:0x%x\n",buf[1]);
+			//printf("rsp command:0x%x\n",buf[2]);
+			//printf("rsp sub-command:0x%x\n",buf[3]);
+			*version = buf[4];
+		}
+		else
+		{	
+			printf("cannot get fwversion\n");
+			return -1;
+		}
+	}	
+	else
+	{
+		printf("cannot get fwversion\n");
+		return -1;
+	}
+	return ret;
+}
 int kl_start_record(as_hid_dev_p p_as_dev)
 {
 	int ret,size;
