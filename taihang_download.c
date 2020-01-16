@@ -71,7 +71,7 @@ int usb_get_data(uint16_t wLen, uint8_t data[])
 	}
 
 	usb_transfer_result = libusb_control_transfer(p_as_dev->dev_handle, tUsbCtlTransferInfo.bmRequestType, tUsbCtlTransferInfo.bRequest, \
-			tUsbCtlTransferInfo.wValue, tUsbCtlTransferInfo.wIndex, data, wLen, USB_CTL_TRANSFER_TIMEROUT);//
+			tUsbCtlTransferInfo.wValue, tUsbCtlTransferInfo.wIndex, data, wLen, 0);//
 	if (usb_transfer_result < LIBUSB_SUCCESS)
 	{
 		printf("ERR:usb transfer error:%d\n", usb_transfer_result);
@@ -97,9 +97,9 @@ int usb_send_data(uint16_t wLen, uint8_t data[])
 	}
 
 	usb_transfer_result = libusb_control_transfer(p_as_dev->dev_handle, tUsbCtlTransferInfo.bmRequestType, tUsbCtlTransferInfo.bRequest, \
-		tUsbCtlTransferInfo.wValue, tUsbCtlTransferInfo.wIndex, data, tUsbCtlTransferInfo.wLength, USB_CTL_TRANSFER_TIMEROUT);//
+		tUsbCtlTransferInfo.wValue, tUsbCtlTransferInfo.wIndex, data, tUsbCtlTransferInfo.wLength, 0);//
 
-	if (usb_transfer_result < LIBUSB_SUCCESS)
+	if (usb_transfer_result < LIBUSB_SUCCESS)  
 	{
 		printf("ERR:usb transfer error:%d\n", usb_transfer_result);
 		return FAIL;
