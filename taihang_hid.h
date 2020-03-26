@@ -23,17 +23,17 @@ typedef struct as_hid_device_ {
 #if 1
 typedef struct
 {
-  uint32_t AudioFrameIndex;
-  uint32_t AudioDataLength;
-  int8_t WakeUpInfo[128];
-  int8_t MajorStatus;
-  int8_t WakeupStatus;
-  int8_t Vad;
-  int8_t rollback;
-  uint8_t reservd1[2];
-  int16_t Doa;
-  uint32_t confidence_factor;
-  uint8_t reserved2[88];
+	uint32_t audio_frame_index;
+	uint32_t audio_data_len;
+	int8_t wakeup_info[128];
+	int8_t major_status;
+	int8_t wakeup_status;
+	int8_t vad;
+	int8_t rollback;
+	uint8_t local_asr_result;
+	int8_t nwakeup;
+	int16_t doa;
+	uint8_t reserved2[92];
 } __attribute__((packed)) kl_audio_info_t;
 
 #else

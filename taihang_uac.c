@@ -98,7 +98,7 @@ int kl_uac_close(as_hid_dev_p p_as_dev)
 int kl_uac_open(as_hid_dev_p p_as_dev)
 {
 	int ret,i;
-	char rate[3] = {0x80,0x3e,0};
+	char rate[3] = {0x80,0x3e,0};//16khz
 	uac_flag = 1;
 	//先做一个check，确保设备没有占用，在最小demo情况下，可以先不考虑这种复杂情况	
 	ret = libusb_kernel_driver_active(p_as_dev->dev_handle,1);

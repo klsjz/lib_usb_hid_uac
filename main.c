@@ -29,6 +29,10 @@ void exit_all_process(void)
 int main(int argc, char *argv[])
 {
 	char buffer[64]={0};
+	char words[64] = {0};
+	char majorstatus;
+	char doa;
+	char nwakeup_status;
 	int size,image_len;
 	int period_size=1024; //fixed size
 	int ret;
@@ -41,14 +45,14 @@ int main(int argc, char *argv[])
     
 	signal(SIGINT, exit_all_process); 
 	file = fopen("./hidpcm.pcm", "wb");
-	image_file = fopen("./taihang.fw","r");
-	fseek(image_file, 0L, SEEK_END);
-	image_len =ftell(image_file);
-	fseek(image_file, 0, SEEK_SET);
-	printf("the image len is %d\r\n",image_len);
-	image_buff = (char *)malloc(image_len);
-	fread(image_buff,1,image_len,image_file);
-	fclose(image_file);
+	//image_file = fopen("./taihang.fw","r");
+	//fseek(image_file, 0L, SEEK_END);
+	//image_len =ftell(image_file);
+	//fseek(image_file, 0, SEEK_SET);
+    //printf("the image len is %d\r\n",image_len);
+	//image_buff = (char *)malloc(image_len);
+	//fread(image_buff,1,image_len,image_file);
+	//fclose(image_file);
 	p_as_dev=kl_device_open();
 	if (!p_as_dev)
 	{
@@ -69,7 +73,7 @@ int main(int argc, char *argv[])
 
 /*下载版本*/
 //	ret = taihang_download(0,image_len,image_buff);
-
+//	return 0;
 /*重启设备*/		
 //	ret = reset_device();
 //	if(ret != LIBUSB_SUCCESS)		
@@ -82,11 +86,36 @@ int main(int argc, char *argv[])
 
 /*uac 录音*/	
 	kl_uac_open(p_as_dev);
+     ret  = libusb_set_option(NULL,LIBUSB_OPTION_LOG_LEVEL);
 
+	while(1)        
+    {           
+
+		ret = kl_get_wakeup_words(p_as_dev,words);
+		if(0==ret)
+		{
+			printf("words:%s\n",words);
+		}
+
+		ret = kl_get_alg_info(p_as_dev,&majorstatus,&doa,&nwakeup_status);
+		{
+			printf("MajorStatus:%d \n",majorstatus);
+			printf("Doa:%d\n",doa);
+			printf("nwakeup:%d\n",nwakeup_status);
+		}
+
+		ret = libusb_handle_events(NULL);               
+		if(ret != LIBUSB_SUCCESS)               
+		{                       
+				printf("can:: handle event erro ,exit! [%d%s]\n",__LINE__,__FUNCTION__);                        
+				break;          
+		}       
+    }
 
 
 	//while (flag==1)
 //	{
+	
 //		kl_audio_play(p_as_dev,__1_wav,__1_wav_len);
 //	}
 //	ret  = libusb_set_option(NULL,LIBUSB_OPTION_LOG_LEVEL);
@@ -94,7 +123,7 @@ int main(int argc, char *argv[])
 
 
 
-#if 1
+#if 0
 	kl_start_record(p_as_dev);
 	while(flag==1 && !kl_audio_read(p_as_dev,pAudio_buffer,&audio_info))
 	{
@@ -106,24 +135,25 @@ int main(int argc, char *argv[])
 			printf("can:: handle event erro ,exit! [%d%s]\n",__LINE__,__FUNCTION__);			
 			break;		
 		}	
-
+/*
 	    if (fwrite(pAudio_buffer, 1, period_size, file) != period_size) 
 	    {
             fprintf(stderr,"write file failed\n");
             fclose(file);
             goto out;    
-        }
-        printf("wakeup words:%s\n", audio_info.WakeUpInfo);
-        printf("MajorStatus:%d\n", audio_info.MajorStatus);
-        printf("Doa:%d\n", audio_info.Doa);
-        printf("Vad:%d\n", audio_info.Vad);
-        printf("confidence_factor:%d\n",audio_info.confidence_factor);
-        printf("WakeupStatus:%d\n",audio_info.WakeupStatus);
+        }*/
+        printf("wakeup words:%s\n", audio_info.wakeup_info);
+        printf("MajorStatus:%d\n", audio_info.major_status);
+        printf("Doa:%d\n", audio_info.doa);
+        printf("Vad:%d\n", audio_info.vad);
+        printf("nwakeup:%d\n",audio_info.nwakeup);
+        printf("WakeupStatus:%d\n",audio_info.wakeup_status);
 	}
 	kl_stop_record(p_as_dev);
 	kl_uac_close(p_as_dev);
 //	kl_stop_play(p_as_dev);
 #endif
+	kl_uac_close(p_as_dev);
 	fclose(file);
 	fclose(fout_uac);
 	kl_device_close(p_as_dev);

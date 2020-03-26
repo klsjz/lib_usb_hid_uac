@@ -48,7 +48,7 @@ int kl_audio_read(as_hid_dev_p p_as_dev, char *pAudio_buffer, kl_audio_info_t *p
 
     //extract audio info and audio buffer
     memcpy(pAudio_info,g_audio_buffer,sizeof(kl_audio_info_t));
-    memcpy(pAudio_buffer,g_audio_buffer+sizeof(kl_audio_info_t),AUDIO_DATA_LENTH);
+   // memcpy(pAudio_buffer,g_audio_buffer+sizeof(kl_audio_info_t),AUDIO_DATA_LENTH);
 
     return 0;
 err:
@@ -64,7 +64,7 @@ as_hid_dev_p kl_device_open(void)
 	
 	as_hid_dev_p p_as_dev;
 	int vid=0x5448;
-	int pid=0x1524;
+	int pid=0x1527;
 
 	p_as_dev=init_as_standard_interface(vid,pid);
 
@@ -112,11 +112,6 @@ int kl_get_fw_version(as_hid_dev_p p_as_dev,unsigned char* version)
 		); 
 		if (0==ret)
 		{
-			//printf("rsp length:%d\n", size);
-			//printf("rsp type:0x%x\n", buf[0]);
-			//printf("rsp status:0x%x\n",buf[1]);
-			//printf("rsp command:0x%x\n",buf[2]);
-			//printf("rsp sub-command:0x%x\n",buf[3]);
 			*version = buf[4];
 		}
 		else
@@ -132,6 +127,105 @@ int kl_get_fw_version(as_hid_dev_p p_as_dev,unsigned char* version)
 	}
 	return ret;
 }
+
+int kl_get_wakeup_words(as_hid_dev_p p_as_dev,char *words)
+{
+	int ret,size;
+	unsigned char buf[64]={0};
+	size_t max_len;
+	max_len = p_as_dev->input_ep_max_packet_size;
+
+    //fill in the hid buffer
+	th_hid_req(COMMAND,GET_WAKEUP_WORD);
+    //p_as_dev->transfer = libusb_alloc_transfer(0);
+    size=64;
+	ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+			p_as_dev->output_endpoint,
+			hid_buffer,
+			max_len,
+			&size,
+			0//no time out
+		); 
+
+	if (ret==0)
+	{
+		ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+			p_as_dev->input_endpoint,
+			buf,
+			max_len,
+			&size,
+			0//no time out
+		); 
+		if (0==ret)
+		{
+			memcpy(words,buf+4,strlen(buf+4));
+		//	printf("wakeup words%s\n",buf+4);
+		}
+		else
+		{	
+			printf("cannot get wake up words\n");
+			return -1;
+		}
+	}	
+	else
+	{
+		printf("cannot get wake up wordsn\n");
+		return -1;
+	}
+	return ret;
+}
+
+int kl_get_alg_info(as_hid_dev_p p_as_dev, char *majorstatus, char*doa, char*nwakeup_status)
+{
+	int ret,size;
+	unsigned char buf[64]={0};
+	size_t max_len;
+	max_len = p_as_dev->input_ep_max_packet_size;
+
+    //fill in the hid buffer
+	th_hid_req(COMMAND,GET_ALG_INFO);
+    //p_as_dev->transfer = libusb_alloc_transfer(0);
+    size=64;
+	ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+			p_as_dev->output_endpoint,
+			hid_buffer,
+			max_len,
+			&size,
+			0//no time out
+		); 
+
+	if (ret==0)
+	{
+		ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+			p_as_dev->input_endpoint,
+			buf,
+			max_len,
+			&size,
+			0//no time out
+		); 
+		if (0==ret)
+		{
+			*majorstatus = buf[4];
+			*doa = buf[5];
+			*nwakeup_status = buf[6];
+		//	printf("111MajorStatus:%d \n",buf[4]);
+		//	printf("111Doa:%d\n",buf[5]);
+		//	printf("111nwakeup:%d\n",buf[6]);
+		}
+		else
+		{	
+			printf("cannot get wake up words\n");
+			return -1;
+		}
+	}	
+	else
+	{
+		printf("cannot get wake up wordsn\n");
+		return -1;
+	}
+	return ret;
+}
+
 int kl_start_record(as_hid_dev_p p_as_dev)
 {
 	int ret,size;
@@ -393,8 +487,8 @@ int kl_audio_play(as_hid_dev_p p_as_dev,char *pAudio_buffer, unsigned int length
     for (i=0;i<index;i++)
     {
     	//pack a new packet
-		kl_header.AudioFrameIndex=g_send_index++;
-  		kl_header.AudioDataLength=AUDIO_DATA_LENTH;
+		kl_header.audio_frame_index=g_send_index++;
+  		kl_header.audio_data_len=AUDIO_DATA_LENTH;
   		//printf("send_len:%d\n",send_len);
   		//fill audio info and audio buffer
     	memcpy(g_play_buffer,&kl_header,sizeof(kl_audio_info_t));
