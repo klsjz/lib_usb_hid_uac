@@ -64,7 +64,7 @@ as_hid_dev_p kl_device_open(void)
 	
 	as_hid_dev_p p_as_dev;
 	int vid=0x5448;
-	int pid=0x1527;
+	int pid=0x1528;
 
 	p_as_dev=init_as_standard_interface(vid,pid);
 
@@ -146,7 +146,6 @@ int kl_get_wakeup_words(as_hid_dev_p p_as_dev,char *words)
 			&size,
 			0//no time out
 		); 
-
 	if (ret==0)
 	{
 		ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
@@ -175,7 +174,7 @@ int kl_get_wakeup_words(as_hid_dev_p p_as_dev,char *words)
 	return ret;
 }
 
-int kl_get_alg_info(as_hid_dev_p p_as_dev, char *majorstatus, char*doa, char*nwakeup_status)
+int kl_get_alg_info(as_hid_dev_p p_as_dev, char *majorstatus, char*doa, char*nwakeup, char*wakeup_status, char*beamflag)
 {
 	int ret,size;
 	unsigned char buf[64]={0};
@@ -205,22 +204,39 @@ int kl_get_alg_info(as_hid_dev_p p_as_dev, char *majorstatus, char*doa, char*nwa
 		); 
 		if (0==ret)
 		{
+//			printf("alg:%02x %02x  %d\n",buf[2],GET_ALG_INFO>>8,(buf[2]==(GET_ALG_INFO>>8)));
+			if(buf[2]!=(GET_ALG_INFO>>8))
+			{
+				ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
+                        		p_as_dev->input_endpoint,
+                        		buf,
+                         		max_len,
+                         		&size,
+                         		0//no time out
+                			);
+			}
+			if(ret!=0)
+			{
+				printf("cannot get alg info\n");	
+			}
 			*majorstatus = buf[4];
 			*doa = buf[5];
-			*nwakeup_status = buf[6];
+			*nwakeup = buf[6];
+			*wakeup_status = buf[7];
+			*beamflag = buf[8];
 		//	printf("111MajorStatus:%d \n",buf[4]);
 		//	printf("111Doa:%d\n",buf[5]);
 		//	printf("111nwakeup:%d\n",buf[6]);
 		}
 		else
 		{	
-			printf("cannot get wake up words\n");
+			printf("cannot get alg info\n");
 			return -1;
 		}
 	}	
 	else
 	{
-		printf("cannot get wake up wordsn\n");
+		printf("cannot get alg info\n");
 		return -1;
 	}
 	return ret;

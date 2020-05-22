@@ -50,7 +50,7 @@ static void cb_xfr(struct libusb_transfer *xfr)
 		}	
 		else
 		{		
-		//	printf("re-submint ok j%d!\n",j);	
+		//	printf("re-submint ok j%d  %d!\n",j,xfr->num_iso_packets);	
 		}
 	}
 	else

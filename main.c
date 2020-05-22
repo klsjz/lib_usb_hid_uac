@@ -1,8 +1,7 @@
-
-
 #include "taihang_hid.h"
 #include <signal.h>
 #include "stdio.h"
+#include<time.h>
 
 FILE *file;
 FILE* fout_uac;
@@ -32,13 +31,16 @@ int main(int argc, char *argv[])
 	char words[64] = {0};
 	char majorstatus;
 	char doa;
-	char nwakeup_status;
+	char nwakeup;
+	char wakeup_status;
+	char beamflag;
 	int size,image_len;
 	int period_size=1024; //fixed size
 	int ret;
-	int i;
+	int i,cnt=0;
 	uint8_t version = 0;
 	kl_audio_info_t audio_info;
+	clock_t start, end;
 	//init audio buffer
 	pAudio_buffer=(char *)malloc(period_size);
 	memset(&audio_info,sizeof(kl_audio_info_t),0);
@@ -86,27 +88,56 @@ int main(int argc, char *argv[])
 
 /*uac 录音*/	
 	kl_uac_open(p_as_dev);
-     ret  = libusb_set_option(NULL,LIBUSB_OPTION_LOG_LEVEL);
+    ret  = libusb_set_option(NULL,LIBUSB_OPTION_LOG_LEVEL);
 
 	while(1)        
     {           
-
-		ret = kl_get_wakeup_words(p_as_dev,words);
-		if(0==ret)
+		cnt++;
+		if(cnt==10000)
+			cnt = 0;
+		start = clock(); 
+#if 1
+		//if(cnt%100==0)
+			ret = kl_get_alg_info(p_as_dev,&majorstatus,&doa,&nwakeup,&wakeup_status,&beamflag);
 		{
-			printf("words:%s\n",words);
-		}
+			printf("Doa:%d\n",doa);
+#if 0
+			end = clock();
+			double seconds  =(double)(end - start)/CLOCKS_PER_SEC;
+			printf("Use time11 is: %.8f\n", seconds);			
 
-		ret = kl_get_alg_info(p_as_dev,&majorstatus,&doa,&nwakeup_status);
-		{
 			printf("MajorStatus:%d \n",majorstatus);
 			printf("Doa:%d\n",doa);
-			printf("nwakeup:%d\n",nwakeup_status);
+			printf("nwakeup:%d\n",nwakeup);
+			printf("wakeup_status:%d\n",wakeup_status);
+			printf("beamflag:%d\n",beamflag);
+#endif
 		}
-
-		ret = libusb_handle_events(NULL);               
+#endif
+	//	start = clock(); 
+#if 1
+		//if(cnt%100==0)
+		{
+			ret = kl_get_wakeup_words(p_as_dev,words);
+			if(0==ret)
+			{
+				end = clock();
+				double seconds  =(double)(end - start)/CLOCKS_PER_SEC;
+				printf("Use time222 is: %.8f\n", seconds);
+				printf("words:%s\n",words);
+			}
+		}
+#endif
+	//	start = clock();
+		ret = libusb_handle_events(NULL);      
+		if(ret == LIBUSB_SUCCESS)               
+		{ 
+	//		end = clock();
+	//		double seconds  =(double)(end - start)/CLOCKS_PER_SEC;
+			printf("Use time333 is:\n");
+		}         
 		if(ret != LIBUSB_SUCCESS)               
-		{                       
+		{                 
 				printf("can:: handle event erro ,exit! [%d%s]\n",__LINE__,__FUNCTION__);                        
 				break;          
 		}       

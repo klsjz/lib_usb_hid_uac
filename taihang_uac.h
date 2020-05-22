@@ -5,6 +5,6 @@
 
 #define PACKET_SIZE 256  //lsusb 列出来的这个传输最大支持 200
 
-#define NUM_PACKETS 10  //这个也可以改 if you like
+#define NUM_PACKETS 20  //这个也可以改 if you like
 
 #endif
