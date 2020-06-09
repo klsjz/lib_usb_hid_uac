@@ -31,7 +31,6 @@ typedef enum command_type
 	GET_SERIAL_NUMBER=0x8400,
 	SET_PLAYER_OPEN=0x0500,
 	SET_PLAYER_CLOSE=0x0501,
-
 }kl_command_type_t;
 
 

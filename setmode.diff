@@ -1,0 +1,102 @@
+diff --git a/main.c b/main.c
+index 4b2f99e..83bc53e 100644
+--- a/main.c
++++ b/main.c
+@@ -73,6 +73,10 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 
++	//kl_set_test_mode(p_as_dev);
++	kl_set_work_mode(p_as_dev);
++	return 0;
++
+ /*下载版本*/
+ //	ret = taihang_download(0,image_len,image_buff);
+ //	return 0;
+diff --git a/taihang_hid.c b/taihang_hid.c
+index 6a427f0..e0369b6 100644
+--- a/taihang_hid.c
++++ b/taihang_hid.c
+@@ -174,6 +174,68 @@ int kl_get_wakeup_words(as_hid_dev_p p_as_dev,char *words)
+ 	return ret;
+ }
+ 
++int kl_set_work_mode(as_hid_dev_p p_as_dev)
++{
++	int ret,size;
++	unsigned char buf[64]={0};
++	size_t max_len;
++	max_len = p_as_dev->input_ep_max_packet_size;
++
++    //fill in the hid buffer
++	th_hid_req(COMMAND,SET_NORMAL_MODE);
++    //p_as_dev->transfer = libusb_alloc_transfer(0);
++    size=64;
++	ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
++			p_as_dev->output_endpoint,
++			hid_buffer,
++			max_len,
++			&size,
++			0//no time out
++		); 
++	if (ret==0)
++	{
++		ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
++			p_as_dev->input_endpoint,
++			buf,
++			max_len,
++			&size,
++			0//no time out
++		); 
++	}
++	return ret;
++}
++
++int kl_set_test_mode(as_hid_dev_p p_as_dev)
++{
++	int ret,size;
++	unsigned char buf[64]={0};
++	size_t max_len;
++	max_len = p_as_dev->input_ep_max_packet_size;
++
++    //fill in the hid buffer
++	th_hid_req(COMMAND,SET_TEST_MODE);
++    //p_as_dev->transfer = libusb_alloc_transfer(0);
++    size=64;
++	ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
++			p_as_dev->output_endpoint,
++			hid_buffer,
++			max_len,
++			&size,
++			0//no time out
++		); 
++	if (ret==0)
++	{
++		ret = libusb_interrupt_transfer(p_as_dev->dev_handle,
++			p_as_dev->input_endpoint,
++			buf,
++			max_len,
++			&size,
++			0//no time out
++		); 
++	}
++	return ret;
++}
++
+ int kl_get_alg_info(as_hid_dev_p p_as_dev, char *majorstatus, char*doa, char*nwakeup, char*wakeup_status, char*beamflag)
+ {
+ 	int ret,size;
+diff --git a/th_protocol.h b/th_protocol.h
+index 3db61a3..09fa32c 100644
+--- a/th_protocol.h
++++ b/th_protocol.h
+@@ -31,7 +31,8 @@ typedef enum command_type
+ 	GET_SERIAL_NUMBER=0x8400,
+ 	SET_PLAYER_OPEN=0x0500,
+ 	SET_PLAYER_CLOSE=0x0501,
+-
++	SET_TEST_MODE = 0x8801,
++	SET_NORMAL_MODE = 0x8800,
+ }kl_command_type_t;
+ 
+ 

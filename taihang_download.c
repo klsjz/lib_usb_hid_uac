@@ -506,6 +506,30 @@ int taihang_download(uint32_t addr, int len, uint8_t image_file[])
     return SUCCESS;
 
 }
+
+int work_mode_set(int mode)
+{
+    int ret;
+    unsigned short crc;
+
+    vdcmd_header.cmd_type = 2;
+    vdcmd_header.sub_cmd = 0x08;
+    vdcmd_header.param = mode;
+    //vdcmd_header.sof = VDCMD_SOF;
+
+   // memcpy(cmd_buf,&vdcmd_header,sizeof(vdcmd_t));
+   // crc = crc16_ccitt_sw(0, cmd_buf, VDCMD_HEADER_LEN);
+   // cmd_buf[VDCMD_HEADER_LEN] = crc & 0xff;
+   // md_buf[VDCMD_HEADER_LEN + 1] = crc >> 8;
+    ret = vdcmd_write(0);
+    if(ret!=SUCCESS)
+    {
+        printf("spi_write error\r\n");
+        return FAIL;
+    }
+    return SUCCESS;
+
+}
    #if 0 
     def download_progress(self, addr, length, file_path):
         self.msg_log.emit('')

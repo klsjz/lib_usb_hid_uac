@@ -64,7 +64,7 @@ as_hid_dev_p kl_device_open(void)
 	
 	as_hid_dev_p p_as_dev;
 	int vid=0x5448;
-	int pid=0x1528;
+	int pid=0x152e;
 
 	p_as_dev=init_as_standard_interface(vid,pid);
 
@@ -173,6 +173,7 @@ int kl_get_wakeup_words(as_hid_dev_p p_as_dev,char *words)
 	}
 	return ret;
 }
+
 
 int kl_get_alg_info(as_hid_dev_p p_as_dev, char *majorstatus, char*doa, char*nwakeup, char*wakeup_status, char*beamflag)
 {

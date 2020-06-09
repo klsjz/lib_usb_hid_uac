@@ -38,6 +38,9 @@
 #define DOWNLOAD_START  0
 #define DOWNLOAD_END    1
 
+#define sell_mode 1
+#define house_mode 0
+
 #define USB_VDREQUEST_I2C_R	0x44
 #define USB_VDREQUEST_I2C_W	0x45
 //////////////////////////////////////
